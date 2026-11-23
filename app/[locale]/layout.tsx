@@ -9,9 +9,9 @@ import GTranslateWidget from "../../components/GTranslateWidget";
 import "../globals.css";
 
 export const metadata = {
-  title: "Ramess Tours | Authentic Egypt Tours & Nile Cruises",
+  title: "Ramess Tours | Authentic Egypt Tours",
   description:
-    "Discover Ancient Egypt with tailor-made tours, luxury Nile cruises, and expert Egyptologist guides.",
+    "Tailor-made tours, luxury Nile cruises, and expert Egyptologist guides.",
 };
 
 export default async function LocaleLayout({
