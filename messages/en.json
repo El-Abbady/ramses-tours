@@ -1,0 +1,51 @@
+{
+  "Navbar": {
+    "home": "Home",
+    "tours": "Egypt Tours",
+    "nileCruises": "Nile Cruises",
+    "dayTours": "Day Tours",
+    "about": "About Us",
+    "contact": "Contact"
+  },
+  "Hero": {
+    "badge": "Authentic Egyptian Experiences",
+    "title": "Discover the Magic of Ancient Egypt with Ramses Tours",
+    "subtitle": "Tailor-made tours, luxury Nile cruises, and expert Egyptologist guides in Cairo, Luxor, Aswan & beyond.",
+    "exploreBtn": "Explore All Tours",
+    "searchPlaceholder": "Where do you want to go? (e.g., Pyramids, Luxor...)"
+  },
+  "Tours": {
+    "featuredTitle": "Most Popular Tours & Packages",
+    "featuredSubtitle": "Handpicked experiences loved by travelers worldwide",
+    "from": "From",
+    "perPerson": "/ person",
+    "viewDetails": "View Details",
+    "duration": "Duration",
+    "city": "Destination",
+    "included": "What's Included",
+    "excluded": "What's Excluded",
+    "itinerary": "Tour Overview & Itinerary"
+  },
+  "Booking": {
+    "title": "Request a Booking",
+    "subtitle": "No upfront payment required. Our travel specialists will contact you within 2 hours.",
+    "fullName": "Full Name",
+    "email": "Email Address",
+    "phone": "WhatsApp / Phone Number",
+    "nationality": "Nationality",
+    "travelDate": "Preferred Travel Date",
+    "adults": "Adults (12+ yrs)",
+    "children": "Children (2-11 yrs)",
+    "notes": "Special Requests / Hotel Name",
+    "submit": "Send Booking Request",
+    "sending": "Sending Request...",
+    "successTitle": "Booking Request Received!",
+    "successMsg": "Thank you! One of our Ramses Tours experts will contact you shortly via WhatsApp or Email to confirm your trip."
+  },
+  "Footer": {
+    "description": "Ramses Tours is your trusted local travel partner in Egypt, offering unforgettable journeys across the land of the Pharaohs.",
+    "quickLinks": "Quick Links",
+    "contactUs": "Contact Us",
+    "rights": "All rights reserved."
+  }
+}

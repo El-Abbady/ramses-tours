@@ -1,0 +1,51 @@
+{
+  "Navbar": {
+    "home": "Accueil",
+    "tours": "Circuits en Égypte",
+    "nileCruises": "Croisières sur le Nil",
+    "dayTours": "Excursions d'une Journée",
+    "about": "À Propos",
+    "contact": "Contact"
+  },
+  "Hero": {
+    "badge": "Expériences Égyptiennes Authentiques",
+    "title": "Découvrez la Magie de l'Égypte Ancienne avec Ramses Tours",
+    "subtitle": "Circuits sur mesure, croisières de luxe sur le Nil et guides égyptologues experts au Caire, Louxor, Assouan et au-delà.",
+    "exploreBtn": "Explorer Tous les Circuits",
+    "searchPlaceholder": "Où souhaitez-vous aller ? (ex. Pyramides, Louxor...)"
+  },
+  "Tours": {
+    "featuredTitle": "Circuits et Forfaits les Plus Populaires",
+    "featuredSubtitle": "Des expériences sélectionnées avec soin et appréciées dans le monde entier",
+    "from": "À partir de",
+    "perPerson": "/ personne",
+    "viewDetails": "Voir les Détails",
+    "duration": "Durée",
+    "city": "Destination",
+    "included": "Ce qui est Inclus",
+    "excluded": "Ce qui n'est pas Inclus",
+    "itinerary": "Aperçu et Itinéraire"
+  },
+  "Booking": {
+    "title": "Demander une Réservation",
+    "subtitle": "Aucun paiement initial requis. Nos spécialistes vous contacteront sous 2 heures.",
+    "fullName": "Nom Complet",
+    "email": "Adresse E-mail",
+    "phone": "WhatsApp / Numéro de Téléphone",
+    "nationality": "Nationalité",
+    "travelDate": "Date de Voyage Souhaitée",
+    "adults": "Adultes (12+ ans)",
+    "children": "Enfants (2-11 ans)",
+    "notes": "Demandes Spéciales / Nom de l'Hôtel",
+    "submit": "Envoyer la Demande",
+    "sending": "Envoi en cours...",
+    "successTitle": "Demande de Réservation Reçue !",
+    "successMsg": "Merci ! L'un de nos experts Ramses Tours vous contactera très prochainement par WhatsApp ou e-mail."
+  },
+  "Footer": {
+    "description": "Ramses Tours est votre partenaire de voyage local de confiance en Égypte, proposant des voyages inoubliables au pays des Pharaons.",
+    "quickLinks": "Liens Rapides",
+    "contactUs": "Contactez-nous",
+    "rights": "Tous droits réservés."
+  }
+}
