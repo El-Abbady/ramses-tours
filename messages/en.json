@@ -9,7 +9,7 @@
   },
   "Hero": {
     "badge": "Authentic Egyptian Experiences",
-    "title": "Discover the Magic of Ancient Egypt with Ramses Tours",
+    "title": "Discover the Magic of Ancient Egypt with Ramess Tours",
     "subtitle": "Tailor-made tours, luxury Nile cruises, and expert Egyptologist guides in Cairo, Luxor, Aswan & beyond.",
     "exploreBtn": "Explore All Tours",
     "searchPlaceholder": "Where do you want to go? (e.g., Pyramids, Luxor...)"
@@ -40,10 +40,10 @@
     "submit": "Send Booking Request",
     "sending": "Sending Request...",
     "successTitle": "Booking Request Received!",
-    "successMsg": "Thank you! One of our Ramses Tours experts will contact you shortly via WhatsApp or Email to confirm your trip."
+    "successMsg": "Thank you! One of our Ramess Tours experts will contact you shortly via WhatsApp or Email to confirm your trip."
   },
   "Footer": {
-    "description": "Ramses Tours is your trusted local travel partner in Egypt, offering unforgettable journeys across the land of the Pharaohs.",
+    "description": "Ramess Tours is your trusted local travel partner in Egypt, offering unforgettable journeys across the land of the Pharaohs.",
     "quickLinks": "Quick Links",
     "contactUs": "Contact Us",
     "rights": "All rights reserved."

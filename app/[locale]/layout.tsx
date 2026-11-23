@@ -9,7 +9,7 @@ import GTranslateWidget from "../../components/GTranslateWidget";
 import "../globals.css";
 
 export const metadata = {
-  title: "Ramses Tours | Authentic Egypt Tours & Nile Cruises",
+  title: "Ramess Tours | Authentic Egypt Tours & Nile Cruises",
   description:
     "Discover Ancient Egypt with tailor-made tours, luxury Nile cruises, and expert Egyptologist guides.",
 };

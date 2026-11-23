@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { Compass, Mail, MessageCircle, MapPin } from "lucide-react";
+import { Mail, MessageCircle, MapPin } from "lucide-react";
 
 export default function Footer() {
   const t = useTranslations("Footer");
@@ -15,11 +15,13 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-amber-500 flex items-center justify-center text-slate-950">
-                <Compass className="w-5 h-5 stroke-[2.5]" />
-              </div>
+              <img
+                src="/icon.png"
+                alt="Ramess Tours Emblem"
+                className="h-10 w-10 object-contain"
+              />
               <span className="text-xl font-bold tracking-wider text-white">
-                RAMSES <span className="text-amber-400">TOURS</span>
+                RAMESS <span className="text-amber-400">TOURS</span>
               </span>
             </div>
             <p className="text-sm text-slate-400 leading-relaxed max-w-sm">
@@ -80,7 +82,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://wa.me/201508842101?text=Hello%20Ramses%20Tours!"
+                  href="https://wa.me/201508842101?text=Hello%20Ramess%20Tours!"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 hover:text-emerald-400 transition-colors"
@@ -103,7 +105,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t border-slate-900 text-center text-xs text-slate-500">
-          © {new Date().getFullYear()} Ramses Tours. {t("rights")}
+          © {new Date().getFullYear()} Ramess Tours. {t("rights")}
         </div>
       </div>
     </footer>

@@ -109,7 +109,7 @@ export default function BookingForm({
   }
 
   const whatsappDirectUrl = `https://wa.me/201508842101?text=${encodeURIComponent(
-    `Hello Ramses Tours, I would like to inquire about: ${tourTitle}`,
+    `Hello Ramess Tours, I would like to inquire about: ${tourTitle}`,
   )}`;
 
   return (

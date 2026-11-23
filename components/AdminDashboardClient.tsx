@@ -338,7 +338,7 @@ export default function AdminDashboardClient({
       <div className="bg-slate-950 text-white rounded-2xl p-6 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
         <div>
           <h1 className="text-2xl font-extrabold">
-            Ramses Tours <span className="text-amber-400">Admin Panel</span>
+            Ramess Tours <span className="text-amber-400">Admin Panel</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1">
             Logged in as: {userEmail}
@@ -636,7 +636,7 @@ export default function AdminDashboardClient({
                     {cleanCustomerPhone && (
                       <a
                         href={`https://wa.me/${cleanCustomerPhone}?text=${encodeURIComponent(
-                          `Hello ${booking.full_name}, thank you for contacting Ramses Tours regarding "${booking.tour_title}".`,
+                          `Hello ${booking.full_name}, thank you for contacting Ramess Tours regarding "${booking.tour_title}".`,
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"

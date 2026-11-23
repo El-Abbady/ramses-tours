@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { Menu, X, Compass, MessageCircle } from "lucide-react";
+import { Menu, X, MessageCircle } from "lucide-react";
 
 export default function Navbar() {
   const t = useTranslations("Navbar");
@@ -17,7 +17,7 @@ export default function Navbar() {
   ];
 
   const whatsappUrl =
-    "https://wa.me/201508842101?text=Hello%20Ramses%20Tours!%20I%20would%20like%20to%20plan%20a%20trip%20to%20Egypt.";
+    "https://wa.me/201508842101?text=Hello%20Ramess%20Tours!%20I%20would%20like%20to%20plan%20a%20trip%20to%20Egypt.";
 
   return (
     <header className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-md text-white border-b border-amber-500/20 shadow-lg">
@@ -25,12 +25,14 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-slate-950 shadow-md group-hover:scale-105 transition-transform">
-              <Compass className="w-6 h-6 stroke-[2.5]" />
-            </div>
+            <img
+              src="/icon.png"
+              alt="Ramess Tours Emblem"
+              className="h-10 w-10 object-contain group-hover:scale-105 transition-transform"
+            />
             <div className="flex flex-col">
               <span className="text-xl font-bold tracking-wider text-white">
-                RAMSES <span className="text-amber-400">TOURS</span>
+                RAMESS <span className="text-amber-400">TOURS</span>
               </span>
               <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400">
                 Egypt Travel Experts

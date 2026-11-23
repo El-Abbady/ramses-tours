@@ -13,14 +13,14 @@ export async function POST(request: Request) {
     }
 
     await resend.emails.send({
-      from: 'Ramses Tours <onboarding@resend.dev>',
+      from: 'Ramess Tours <onboarding@resend.dev>',
       to: adminEmail,
       subject: `New Booking Request: ${body.tour_title} (${body.full_name})`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
           <div style="background-color: #020617; color: #ffffff; padding: 20px;">
             <h2 style="margin: 0; color: #fbbf24;">New Tour Booking Request</h2>
-            <p style="margin: 5px 0 0; font-size: 13px; color: #cbd5e1;">Ramses Tours Lead Alert</p>
+            <p style="margin: 5px 0 0; font-size: 13px; color: #cbd5e1;">Ramess Tours Lead Alert</p>
           </div>
           <div style="padding: 20px; color: #0f172a; line-height: 1.6;">
             <p><strong>Tour:</strong> ${body.tour_title}</p>
