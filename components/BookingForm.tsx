@@ -183,7 +183,7 @@ export default function BookingForm({
               required
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              placeholder="+1 234 567 890"
+              placeholder="+20 150 8842 101"
               className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:border-amber-500"
             />
           </div>
