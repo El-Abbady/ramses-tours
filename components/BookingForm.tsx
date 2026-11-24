@@ -40,13 +40,24 @@ export default function BookingForm({
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
+  const now = new Date();
+  const today = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .split("T")[0];
+
   const estimatedTotal =
     adults * pricePerPerson + children * (pricePerPerson * 0.5);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+
+    if (!travelDate || travelDate < today) {
+      setError("Please select today or a future date for your trip.");
+      return;
+    }
+
+    setLoading(true);
 
     const payload = {
       tour_id: tourId,
@@ -189,6 +200,7 @@ export default function BookingForm({
             <input
               type="date"
               required
+              min={today}
               value={travelDate}
               onChange={(e) => setTravelDate(e.target.value)}
               className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:border-amber-500"
