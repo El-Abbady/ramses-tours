@@ -9,7 +9,6 @@ import {
   Pencil,
   LogOut,
   CalendarCheck,
-  Map,
   Users,
   Phone,
   Mail,
@@ -24,8 +23,28 @@ import {
   Compass,
   Ship,
   Briefcase,
+  Sun,
   Globe,
 } from "lucide-react";
+
+const CATEGORY_META: Record<string, { label: string; badgeClass: string }> = {
+  "city-tour": {
+    label: "City Tour",
+    badgeClass: "bg-amber-100 text-amber-800",
+  },
+  package: {
+    label: "Package",
+    badgeClass: "bg-blue-100 text-blue-800",
+  },
+  "nile-cruise": {
+    label: "Nile Cruise",
+    badgeClass: "bg-cyan-100 text-cyan-800",
+  },
+  "desert-safari": {
+    label: "Desert Safari",
+    badgeClass: "bg-orange-100 text-orange-800",
+  },
+};
 
 export default function AdminDashboardClient({
   initialTours,
@@ -45,6 +64,7 @@ export default function AdminDashboardClient({
   const [bookingFilter, setBookingFilter] = useState<
     "all" | "pending" | "confirmed" | "cancelled"
   >("all");
+  const [tourCategoryFilter, setTourCategoryFilter] = useState<string>("all");
   const [editingTourId, setEditingTourId] = useState<string | null>(null);
   const [tours, setTours] = useState(initialTours);
   const [bookings, setBookings] = useState(initialBookings);
@@ -63,34 +83,64 @@ export default function AdminDashboardClient({
     (b) => b.status === "cancelled",
   ).length;
 
+  const normalizeCategory = (cat?: string) => {
+    if (!cat || cat === "day-tours" || cat === "day-tour") return "city-tour";
+    if (cat === "packages") return "package";
+    if (cat === "nile-cruises") return "nile-cruise";
+    return cat;
+  };
+
   const totalTours = tours.length;
-  const dayToursCount = tours.filter((t) => t.category === "day-tours").length;
-  const nileCruisesCount = tours.filter(
-    (t) => t.category === "nile-cruises",
+  const cityToursCount = tours.filter(
+    (t) => normalizeCategory(t.category) === "city-tour",
   ).length;
-  const packagesCount = tours.filter((t) => t.category === "packages").length;
+  const packagesCount = tours.filter(
+    (t) => normalizeCategory(t.category) === "package",
+  ).length;
+  const nileCruisesCount = tours.filter(
+    (t) => normalizeCategory(t.category) === "nile-cruise",
+  ).length;
+  const desertSafariCount = tours.filter(
+    (t) => normalizeCategory(t.category) === "desert-safari",
+  ).length;
 
   const filteredBookings =
     bookingFilter === "all"
       ? bookings
       : bookings.filter((b) => (b.status || "pending") === bookingFilter);
 
-  // Tour Form Fields (Single Language — GTranslate handles all visitor languages)
+  const filteredTours =
+    tourCategoryFilter === "all"
+      ? tours
+      : tours.filter(
+          (t) => normalizeCategory(t.category) === tourCategoryFilter,
+        );
+
+  // Shared & Category-Specific Form Fields
   const [slug, setSlug] = useState("");
-  const [category, setCategory] = useState("day-tours");
-  const [city, setCity] = useState("Aswan");
-  const [duration, setDuration] = useState("2 Days / 1 Night");
+  const [category, setCategory] = useState<
+    "city-tour" | "package" | "nile-cruise" | "desert-safari"
+  >("city-tour");
+  const [city, setCity] = useState("Cairo");
+  const [duration, setDuration] = useState("1 Day (8 Hours)");
   const [tourType, setTourType] = useState("Private Tour");
-  const [pickupDropoff, setPickupDropoff] = useState(
-    "Aswan Hotel / Airport / Cruise",
-  );
+  const [pickupDropoff, setPickupDropoff] = useState("Hotel / Airport");
   const [guideLanguages, setGuideLanguages] = useState(
     "English, Spanish, French",
   );
-  const [price, setPrice] = useState(300);
+  const [price, setPrice] = useState(85);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [pricingTiers, setPricingTiers] = useState(
-    "Single Person = $600\nFrom 2 to 3 People = $370 per person\nFrom 4 to 10 People = $300 per person\nChild (6 to 11 yrs) = 50% of adult price",
+    "Single Person = $150\nFrom 2 to 3 People = $95 per person\nFrom 4 to 10 People = $85 per person\nChild (6 to 11 yrs) = 50% of adult price",
+  );
+
+  // Category-specific state
+  const [citiesCovered, setCitiesCovered] = useState("Cairo, Aswan & Luxor");
+  const [sailingRoute, setSailingRoute] = useState("Aswan to Luxor");
+  const [shipClass, setShipClass] = useState("5-Star Deluxe");
+  const [shipName, setShipName] = useState("");
+  const [activityType, setActivityType] = useState(
+    "4x4 Land Cruiser & Desert Camping",
   );
 
   const [titleEn, setTitleEn] = useState("");
@@ -101,29 +151,67 @@ export default function AdminDashboardClient({
   const [includedText, setIncludedText] = useState("");
   const [excludedText, setExcludedText] = useState("");
 
+  const handleCategorySwitch = (
+    newCat: "city-tour" | "package" | "nile-cruise" | "desert-safari",
+  ) => {
+    setCategory(newCat);
+    if (editingTourId) return;
+
+    if (newCat === "city-tour") {
+      setCity("Cairo");
+      setDuration("1 Day (8 Hours)");
+      setTourType("Private Tour");
+      setPickupDropoff("Hotel / Airport");
+      setPrice(85);
+    } else if (newCat === "package") {
+      setCity("Egypt Multi-City");
+      setDuration("6 Days / 5 Nights");
+      setCitiesCovered("Cairo, Aswan & Luxor");
+      setTourType("Private Guided Package");
+      setPickupDropoff("Cairo Airport Meet & Assist");
+      setPrice(950);
+    } else if (newCat === "nile-cruise") {
+      setCity("Aswan & Luxor");
+      setSailingRoute("Aswan to Luxor");
+      setDuration("4 Days / 3 Nights");
+      setShipClass("5-Star Deluxe");
+      setShipName("");
+      setTourType("Full Board Nile Cruise");
+      setPickupDropoff("Aswan Airport / Hotel to Luxor Airport / Hotel");
+      setPrice(650);
+    } else if (newCat === "desert-safari") {
+      setCity("White Desert & Bahariya Oasis");
+      setDuration("2 Days / 1 Night Camping");
+      setActivityType("4x4 Land Cruiser & Desert Camping");
+      setTourType("Private Safari Expedition");
+      setPickupDropoff("Cairo or Giza Hotel");
+      setPrice(260);
+    }
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/admin/login");
     router.refresh();
   };
 
-  const resetFormForCreate = () => {
+  const resetFormForCreate = (
+    defaultCategory:
+      | "city-tour"
+      | "package"
+      | "nile-cruise"
+      | "desert-safari" = "city-tour",
+  ) => {
     setEditingTourId(null);
     setSlug("");
-    setCategory("day-tours");
-    setCity("Cairo");
-    setDuration("1 Day (8 Hours)");
-    setTourType("Private Tour");
-    setPickupDropoff("Hotel / Airport");
-    setGuideLanguages("English, Spanish, French");
-    setPrice(85);
     setUploadedImages([]);
-    setPricingTiers(
-      "Single Person = $150\nFrom 2 to 3 People = $95 per person\nFrom 4 to 10 People = $85 per person\nChild (6 to 11 yrs) = 50% of adult price",
-    );
     setTitleEn("");
     setSummaryEn("");
     setDescEn("");
+    setGuideLanguages("English, Spanish, French");
+    setPricingTiers(
+      "Single Person = $150\nFrom 2 to 3 People = $95 per person\nFrom 4 to 10 People = $85 per person\nChild (6 to 11 yrs) = 50% of adult price",
+    );
     setHighlightsText(
       "Private Egyptologist Tour Guide\nHassle-free hotel transfers",
     );
@@ -131,19 +219,30 @@ export default function AdminDashboardClient({
       "Hotel pickup and drop-off\nPrivate air-conditioned vehicle\nLicensed Egyptologist guide\nBottled water",
     );
     setExcludedText("Entrance fees to monuments\nPersonal expenses & tipping");
+    handleCategorySwitch(defaultCategory);
     setActiveTab("form");
   };
 
   const startEditingTour = (tour: any) => {
+    const normalizedCat = normalizeCategory(tour.category) as
+      | "city-tour"
+      | "package"
+      | "nile-cruise"
+      | "desert-safari";
     setEditingTourId(tour.id);
     setSlug(tour.slug || "");
-    setCategory(tour.category || "day-tours");
-    setCity(tour.city || "");
+    setCategory(normalizedCat);
+    setCity(tour.city || "Cairo");
     setDuration(tour.duration || "");
     setTourType(tour.tour_type || "Private Tour");
     setPickupDropoff(tour.pickup_dropoff || "");
     setGuideLanguages(tour.guide_languages || "English, Spanish, French");
     setPrice(tour.price || 0);
+    setCitiesCovered(tour.cities_covered || "");
+    setSailingRoute(tour.sailing_route || "Aswan to Luxor");
+    setShipClass(tour.ship_class || "5-Star Deluxe");
+    setShipName(tour.ship_name || "");
+    setActivityType(tour.activity_type || "4x4 Land Cruiser & Desert Camping");
     setUploadedImages(
       Array.isArray(tour.gallery) && tour.gallery.length > 0
         ? tour.gallery
@@ -154,7 +253,7 @@ export default function AdminDashboardClient({
     setPricingTiers(tour.pricing_tiers || "");
     setTitleEn(tour.title_en || "");
     setSummaryEn(tour.summary_en || "");
-    setDescEn(tour.description_en || "");
+    setDescEn(tour.itinerary || tour.description_en || "");
     setHighlightsText(
       Array.isArray(tour.highlights) ? tour.highlights.join("\n") : "",
     );
@@ -212,7 +311,7 @@ export default function AdminDashboardClient({
     e.preventDefault();
 
     if (uploadedImages.length === 0) {
-      alert("Please upload at least one image from your PC for this tour.");
+      alert("Please upload at least one image from your PC for this listing.");
       return;
     }
 
@@ -223,14 +322,27 @@ export default function AdminDashboardClient({
       .trim()
       .replace(/[^a-z0-9]+/g, "-");
 
+    const resolvedCity =
+      category === "package"
+        ? citiesCovered || "Egypt Multi-City"
+        : category === "nile-cruise"
+          ? sailingRoute
+          : city;
+
     const tourPayload = {
       slug: formattedSlug,
       category,
-      city,
+      city: resolvedCity,
       duration,
-      tour_type: tourType,
+      tour_type: category === "desert-safari" ? activityType : tourType,
       pickup_dropoff: pickupDropoff,
       guide_languages: guideLanguages,
+      cities_covered: category === "package" ? citiesCovered : null,
+      sailing_route: category === "nile-cruise" ? sailingRoute : null,
+      ship_class: category === "nile-cruise" ? shipClass : null,
+      ship_name: category === "nile-cruise" ? shipName : null,
+      activity_type: category === "desert-safari" ? activityType : null,
+      itinerary: descEn,
       price: Number(price),
       pricing_tiers: pricingTiers,
       cover_image: uploadedImages[0],
@@ -263,7 +375,7 @@ export default function AdminDashboardClient({
       setSaving(false);
 
       if (error) {
-        alert("Error updating tour: " + error.message);
+        alert("Error updating listing: " + error.message);
         return;
       }
 
@@ -281,7 +393,7 @@ export default function AdminDashboardClient({
       setSaving(false);
 
       if (error) {
-        alert("Error adding tour: " + error.message);
+        alert("Error adding listing: " + error.message);
         return;
       }
 
@@ -292,7 +404,7 @@ export default function AdminDashboardClient({
   };
 
   const handleDeleteTour = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this tour?")) return;
+    if (!confirm("Are you sure you want to delete this item?")) return;
 
     const { error } = await supabase.from("tours").delete().eq("id", id);
     if (!error) {
@@ -424,42 +536,69 @@ export default function AdminDashboardClient({
           </div>
         </div>
 
-        {/* Card 2: Tours by Category Statistics */}
+        {/* Card 2: Published Listings by 4 Categories */}
         <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-700 flex items-center gap-2">
-              <span>Published Tours by Category</span>
+            <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-700">
+              Published Listings by Category
             </h2>
             <span className="text-xs font-bold bg-slate-100 text-slate-700 px-3 py-1 rounded-full">
               Total: {totalTours}
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <button
               type="button"
-              onClick={() => setActiveTab("tours")}
-              className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-amber-400 transition-all cursor-pointer"
+              onClick={() => {
+                setActiveTab("tours");
+                setTourCategoryFilter("city-tour");
+              }}
+              className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-amber-400 transition-all cursor-pointer"
             >
               <div className="flex items-center justify-between text-slate-600 mb-1">
-                <span className="text-xs font-bold uppercase">Day Tours</span>
+                <span className="text-[11px] font-bold uppercase">
+                  City Tours
+                </span>
                 <Compass className="w-4 h-4 text-amber-600" />
               </div>
               <p className="text-2xl font-extrabold text-slate-900">
-                {dayToursCount}
+                {cityToursCount}
               </p>
             </button>
 
             <button
               type="button"
-              onClick={() => setActiveTab("tours")}
-              className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-amber-400 transition-all cursor-pointer"
+              onClick={() => {
+                setActiveTab("tours");
+                setTourCategoryFilter("package");
+              }}
+              className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-amber-400 transition-all cursor-pointer"
             >
               <div className="flex items-center justify-between text-slate-600 mb-1">
-                <span className="text-xs font-bold uppercase">
+                <span className="text-[11px] font-bold uppercase">
+                  Packages
+                </span>
+                <Briefcase className="w-4 h-4 text-blue-600" />
+              </div>
+              <p className="text-2xl font-extrabold text-slate-900">
+                {packagesCount}
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("tours");
+                setTourCategoryFilter("nile-cruise");
+              }}
+              className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-amber-400 transition-all cursor-pointer"
+            >
+              <div className="flex items-center justify-between text-slate-600 mb-1">
+                <span className="text-[11px] font-bold uppercase">
                   Nile Cruises
                 </span>
-                <Ship className="w-4 h-4 text-amber-600" />
+                <Ship className="w-4 h-4 text-cyan-600" />
               </div>
               <p className="text-2xl font-extrabold text-slate-900">
                 {nileCruisesCount}
@@ -468,15 +607,20 @@ export default function AdminDashboardClient({
 
             <button
               type="button"
-              onClick={() => setActiveTab("tours")}
-              className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-amber-400 transition-all cursor-pointer"
+              onClick={() => {
+                setActiveTab("tours");
+                setTourCategoryFilter("desert-safari");
+              }}
+              className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-amber-400 transition-all cursor-pointer"
             >
               <div className="flex items-center justify-between text-slate-600 mb-1">
-                <span className="text-xs font-bold uppercase">Packages</span>
-                <Briefcase className="w-4 h-4 text-amber-600" />
+                <span className="text-[11px] font-bold uppercase">
+                  Desert Safari
+                </span>
+                <Sun className="w-4 h-4 text-orange-600" />
               </div>
               <p className="text-2xl font-extrabold text-slate-900">
-                {packagesCount}
+                {desertSafariCount}
               </p>
             </button>
           </div>
@@ -501,18 +645,21 @@ export default function AdminDashboardClient({
         </button>
 
         <button
-          onClick={() => setActiveTab("tours")}
+          onClick={() => {
+            setActiveTab("tours");
+            setTourCategoryFilter("all");
+          }}
           className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer ${
             activeTab === "tours"
               ? "bg-slate-900 text-amber-400 shadow-md"
               : "bg-white text-slate-700 border border-slate-200"
           }`}
         >
-          <span>Manage Tours ({tours.length})</span>
+          <span>Manage Listings ({tours.length})</span>
         </button>
 
         <button
-          onClick={resetFormForCreate}
+          onClick={() => resetFormForCreate("city-tour")}
           className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer ${
             activeTab === "form" && !editingTourId
               ? "bg-amber-500 text-slate-950 shadow-md"
@@ -520,14 +667,13 @@ export default function AdminDashboardClient({
           }`}
         >
           <Plus className="w-4 h-4" />
-          <span>Add New Tour</span>
+          <span>Add New Listing</span>
         </button>
       </div>
 
       {/* TAB 1: BOOKING REQUESTS */}
       {activeTab === "bookings" && (
         <div className="space-y-4">
-          {/* Status Filter Pills */}
           <div className="flex flex-wrap gap-2 mb-4">
             {(
               [
@@ -631,7 +777,6 @@ export default function AdminDashboardClient({
                     )}
                   </div>
 
-                  {/* Status & Direct WhatsApp Reply */}
                   <div className="flex flex-wrap gap-2 shrink-0">
                     {cleanCustomerPhone && (
                       <a
@@ -683,54 +828,99 @@ export default function AdminDashboardClient({
         </div>
       )}
 
-      {/* TAB 2: MANAGE TOURS (WITH EDIT & DELETE) */}
+      {/* TAB 2: MANAGE LISTINGS BY CATEGORY */}
       {activeTab === "tours" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tours.map((tour) => (
-            <div
-              key={tour.id}
-              className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col"
-            >
-              <img
-                src={tour.cover_image}
-                alt={tour.title_en}
-                className="h-44 w-full object-cover"
-              />
-              <div className="p-5 flex-grow flex flex-col justify-between">
-                <div>
-                  <span className="text-[11px] font-bold uppercase text-amber-600">
-                    {tour.category} • {tour.city}
-                  </span>
-                  <h3 className="font-bold text-slate-900 mt-1 mb-2">
-                    {tour.title_en}
-                  </h3>
-                </div>
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <span className="font-extrabold text-slate-900">
-                    From ${tour.price}
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => startEditingTour(tour)}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-slate-800 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg cursor-pointer"
-                    >
-                      <Pencil className="w-3.5 h-3.5" /> Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteTour(tour.id)}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" /> Delete
-                    </button>
+        <div className="space-y-6">
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: "all", label: `All (${totalTours})` },
+              { id: "city-tour", label: `City Tours (${cityToursCount})` },
+              { id: "package", label: `Packages (${packagesCount})` },
+              {
+                id: "nile-cruise",
+                label: `Nile Cruises (${nileCruisesCount})`,
+              },
+              {
+                id: "desert-safari",
+                label: `Desert Safari (${desertSafariCount})`,
+              },
+            ].map((pill) => (
+              <button
+                key={pill.id}
+                onClick={() => setTourCategoryFilter(pill.id)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors cursor-pointer ${
+                  tourCategoryFilter === pill.id
+                    ? "bg-amber-500 text-slate-950"
+                    : "bg-white text-slate-600 border border-slate-200 hover:border-amber-400"
+                }`}
+              >
+                {pill.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredTours.map((tour) => {
+              const normCat = normalizeCategory(tour.category);
+              const meta = CATEGORY_META[normCat] || {
+                label: normCat,
+                badgeClass: "bg-slate-100 text-slate-700",
+              };
+
+              return (
+                <div
+                  key={tour.id}
+                  className="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm flex flex-col"
+                >
+                  <img
+                    src={tour.cover_image}
+                    alt={tour.title_en}
+                    className="h-44 w-full object-cover"
+                  />
+                  <div className="p-5 flex-grow flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span
+                          className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full ${meta.badgeClass}`}
+                        >
+                          {meta.label}
+                        </span>
+                        <span className="text-[11px] font-bold text-slate-500">
+                          {tour.city} • {tour.duration}
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-slate-900 mt-2 mb-2">
+                        {tour.title_en}
+                      </h3>
+                    </div>
+                    <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                      <span className="font-extrabold text-slate-900">
+                        From ${tour.price}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => startEditingTour(tour)}
+                          className="inline-flex items-center gap-1 text-xs font-bold text-slate-800 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg cursor-pointer"
+                        >
+                          <Pencil className="w-3.5 h-3.5" /> Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteTour(tour.id)}
+                          className="inline-flex items-center gap-1 text-xs font-bold text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" /> Delete
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
       )}
 
-      {/* TAB 3: ADD OR EDIT TOUR FORM (SINGLE LANGUAGE — GTRANSLATE READY) */}
+      {/* TAB 3: ADD OR EDIT FORM WITH 4-CATEGORY SELECTOR */}
       {activeTab === "form" && (
         <form
           onSubmit={handleSaveTour}
@@ -739,13 +929,13 @@ export default function AdminDashboardClient({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <h2 className="text-xl font-extrabold text-slate-900">
-                {editingTourId ? "Edit Existing Tour" : "Publish a New Tour"}
+                {editingTourId ? "Edit Listing" : "Create New Listing"}
               </h2>
               <p className="text-xs text-emerald-700 font-semibold flex items-center gap-1.5 mt-1">
                 <Globe className="w-4 h-4" />
                 <span>
-                  Write once in English — the website translator automatically
-                  translates it for visitors.
+                  Step 1: Choose Category below — Step 2: Fill in details once
+                  in English.
                 </span>
               </p>
             </div>
@@ -763,14 +953,82 @@ export default function AdminDashboardClient({
             )}
           </div>
 
+          {/* 4-CATEGORY VISUAL SELECTOR */}
+          <div>
+            <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700 mb-2">
+              Select Category *
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                {
+                  id: "city-tour",
+                  label: "City Tours",
+                  sub: "Cairo, Luxor, Aswan, Hurghada, Alex",
+                  icon: Compass,
+                },
+                {
+                  id: "package",
+                  label: "Packages",
+                  sub: "Multi-day Egypt holidays",
+                  icon: Briefcase,
+                },
+                {
+                  id: "nile-cruise",
+                  label: "Nile Cruises",
+                  sub: "Luxor & Aswan river cruises",
+                  icon: Ship,
+                },
+                {
+                  id: "desert-safari",
+                  label: "Desert Safari",
+                  sub: "White Desert, Siwa & Quad",
+                  icon: Sun,
+                },
+              ].map((cat) => {
+                const Icon = cat.icon;
+                const isSelected = category === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() =>
+                      handleCategorySwitch(
+                        cat.id as
+                          | "city-tour"
+                          | "package"
+                          | "nile-cruise"
+                          | "desert-safari",
+                      )
+                    }
+                    className={`p-4 rounded-2xl border-2 text-left transition-all cursor-pointer ${
+                      isSelected
+                        ? "border-amber-500 bg-amber-50/70 shadow-sm"
+                        : "border-slate-200 bg-white hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <Icon
+                        className={`w-4 h-4 ${isSelected ? "text-amber-600" : "text-slate-500"}`}
+                      />
+                      <span className="text-sm font-extrabold text-slate-900">
+                        {cat.label}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500">{cat.sub}</p>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Multi-Image Upload from PC */}
           <div className="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-6">
             <label className="block text-sm font-extrabold text-slate-900 mb-1">
-              Tour Photos (Upload Multiple Images from Your PC) *
+              Photos (Upload Multiple Images from Your PC) *
             </label>
             <p className="text-xs text-slate-500 mb-4">
               The first image is the main Cover Image; all images appear in the
-              large tour carousel gallery.
+              gallery carousel.
             </p>
 
             <label className="inline-flex items-center gap-2 bg-slate-900 hover:bg-amber-500 text-white hover:text-slate-950 font-bold text-xs px-5 py-3 rounded-xl cursor-pointer transition-colors">
@@ -825,8 +1083,8 @@ export default function AdminDashboardClient({
             )}
           </div>
 
-          {/* Core Tour Specifications */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* CATEGORY-SPECIFIC & CORE SPECIFICATIONS */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
                 URL Slug (no spaces) *
@@ -834,65 +1092,231 @@ export default function AdminDashboardClient({
               <input
                 type="text"
                 required
+                placeholder="e.g. giza-pyramids-full-day"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Category *
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white"
-              >
-                <option value="day-tours">Day Tours</option>
-                <option value="nile-cruises">Nile Cruises</option>
-                <option value="packages">Egypt Packages</option>
-              </select>
-            </div>
+            {/* CITY TOURS SPECIFIC */}
+            {category === "city-tour" && (
+              <>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    City *
+                  </label>
+                  <select
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white"
+                  >
+                    <option value="Cairo">Cairo</option>
+                    <option value="Luxor">Luxor</option>
+                    <option value="Aswan">Aswan</option>
+                    <option value="Hurghada">Hurghada</option>
+                    <option value="Alexandria">Alexandria</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                City / Destination *
-              </label>
-              <input
-                type="text"
-                required
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl"
-              />
-            </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Duration *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 1 Day (8 Hours)"
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl"
+                  />
+                </div>
+              </>
+            )}
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Duration *
-              </label>
-              <input
-                type="text"
-                required
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl"
-              />
-            </div>
+            {/* PACKAGES SPECIFIC */}
+            {category === "package" && (
+              <>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Package Duration (Days / Nights) *
+                  </label>
+                  <select
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white"
+                  >
+                    <option value="2 Days / 1 Night">2 Days / 1 Night</option>
+                    <option value="3 Days / 2 Nights">3 Days / 2 Nights</option>
+                    <option value="4 Days / 3 Nights">4 Days / 3 Nights</option>
+                    <option value="5 Days / 4 Nights">5 Days / 4 Nights</option>
+                    <option value="6 Days / 5 Nights">6 Days / 5 Nights</option>
+                    <option value="7 Days / 6 Nights">7 Days / 6 Nights</option>
+                    <option value="8 Days / 7 Nights">8 Days / 7 Nights</option>
+                    <option value="10 Days / 9 Nights">
+                      10 Days / 9 Nights
+                    </option>
+                  </select>
+                </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Tour Type *
-              </label>
-              <input
-                type="text"
-                required
-                value={tourType}
-                onChange={(e) => setTourType(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl"
-              />
-            </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Cities Covered *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Cairo, Aswan & Luxor"
+                    value={citiesCovered}
+                    onChange={(e) => setCitiesCovered(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* NILE CRUISES SPECIFIC */}
+            {category === "nile-cruise" && (
+              <>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Sailing Route *
+                  </label>
+                  <select
+                    value={sailingRoute}
+                    onChange={(e) => setSailingRoute(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white"
+                  >
+                    <option value="Aswan to Luxor">Aswan to Luxor</option>
+                    <option value="Luxor to Aswan">Luxor to Aswan</option>
+                    <option value="Luxor to Aswan & Back (Round Trip)">
+                      Luxor to Aswan & Back (Round Trip)
+                    </option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Cruise Duration *
+                  </label>
+                  <select
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white"
+                  >
+                    <option value="4 Days / 3 Nights">4 Days / 3 Nights</option>
+                    <option value="5 Days / 4 Nights">5 Days / 4 Nights</option>
+                    <option value="8 Days / 7 Nights">8 Days / 7 Nights</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Ship Class / Rating *
+                  </label>
+                  <select
+                    value={shipClass}
+                    onChange={(e) => setShipClass(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white"
+                  >
+                    <option value="5-Star Standard">5-Star Standard</option>
+                    <option value="5-Star Deluxe">5-Star Deluxe</option>
+                    <option value="5-Star Luxury">5-Star Luxury</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Cruise Ship Name (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. MS Mayfair / MS Farah"
+                    value={shipName}
+                    onChange={(e) => setShipName(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* DESERT SAFARI SPECIFIC */}
+            {category === "desert-safari" && (
+              <>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Desert Destination / Departure City *
+                  </label>
+                  <select
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white"
+                  >
+                    <option value="White Desert & Bahariya Oasis">
+                      White Desert & Bahariya Oasis
+                    </option>
+                    <option value="Siwa Oasis">Siwa Oasis</option>
+                    <option value="Hurghada Desert">Hurghada Desert</option>
+                    <option value="Giza Pyramids Desert">
+                      Giza Pyramids Desert
+                    </option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Safari Duration *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 2 Days / 1 Night Camping"
+                    value={duration}
+                    onChange={(e) => setDuration(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Vehicle / Activity Type *
+                  </label>
+                  <select
+                    value={activityType}
+                    onChange={(e) => setActivityType(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white"
+                  >
+                    <option value="4x4 Land Cruiser & Desert Camping">
+                      4x4 Land Cruiser & Desert Camping
+                    </option>
+                    <option value="Quad Bike / ATV">Quad Bike / ATV</option>
+                    <option value="Camel Ride">Camel Ride</option>
+                    <option value="Overnight Bedouin Camp">
+                      Overnight Bedouin Camp
+                    </option>
+                  </select>
+                </div>
+              </>
+            )}
+
+            {/* COMMON OPERATIONAL FIELDS */}
+            {category !== "desert-safari" && (
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Tour / Board Type *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={tourType}
+                  onChange={(e) => setTourType(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl"
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -947,11 +1371,11 @@ export default function AdminDashboardClient({
             />
           </div>
 
-          {/* Tour Content (English Only) */}
+          {/* Title, Overview & Day-by-Day Itinerary */}
           <div className="space-y-4 pt-4 border-t border-slate-100">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Tour Title *
+                Title *
               </label>
               <input
                 type="text"
@@ -977,11 +1401,18 @@ export default function AdminDashboardClient({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Day-by-Day Itinerary *
+                {category === "city-tour"
+                  ? "Full Description & Tour Program *"
+                  : "Day-by-Day / Trip Itinerary *"}
               </label>
               <textarea
-                rows={6}
+                rows={7}
                 required
+                placeholder={
+                  category === "city-tour"
+                    ? "Describe the itinerary and sites visited..."
+                    : "Day 1: Arrival & transfer...\nDay 2: Guided sightseeing..."
+                }
                 value={descEn}
                 onChange={(e) => setDescEn(e.target.value)}
                 className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-xl"
@@ -993,7 +1424,7 @@ export default function AdminDashboardClient({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Tour Highlights (One bullet per line)
+                Highlights (One bullet per line)
               </label>
               <textarea
                 rows={5}
@@ -1034,8 +1465,8 @@ export default function AdminDashboardClient({
             {saving
               ? "Saving Changes..."
               : editingTourId
-                ? "Update Tour Now"
-                : "Publish Tour Now"}
+                ? "Update Listing Now"
+                : "Publish Listing Now"}
           </button>
         </form>
       )}

@@ -14,7 +14,16 @@ import {
   Navigation,
   Globe,
   DollarSign,
+  Ship,
+  Compass,
 } from "lucide-react";
+
+const CATEGORY_LABELS: Record<string, string> = {
+  "city-tour": "City Tour",
+  package: "Egypt Package",
+  "nile-cruise": "Nile Cruise",
+  "desert-safari": "Desert Safari",
+};
 
 export default async function TourDetailsPage({
   params,
@@ -35,24 +44,9 @@ export default async function TourDetailsPage({
     notFound();
   }
 
-  const title =
-    locale === "es"
-      ? tour.title_es
-      : locale === "fr"
-        ? tour.title_fr
-        : tour.title_en;
-  const summary =
-    locale === "es"
-      ? tour.summary_es
-      : locale === "fr"
-        ? tour.summary_fr
-        : tour.summary_en;
-  const description =
-    locale === "es"
-      ? tour.description_es
-      : locale === "fr"
-        ? tour.description_fr
-        : tour.description_en;
+  const title = tour.title_en;
+  const summary = tour.summary_en;
+  const description = tour.itinerary || tour.description_en;
 
   const highlightsList: string[] = Array.isArray(tour.highlights)
     ? tour.highlights
@@ -73,6 +67,16 @@ export default async function TourDetailsPage({
     ? tour.pricing_tiers.split("\n").filter((l: string) => l.trim() !== "")
     : [];
 
+  const categoryBadge =
+    CATEGORY_LABELS[tour.category] || tour.category.replace("-", " ");
+
+  const locationDisplay =
+    tour.category === "nile-cruise"
+      ? tour.sailing_route || tour.city
+      : tour.category === "package"
+        ? tour.cities_covered || tour.city
+        : tour.city;
+
   return (
     <div className="bg-slate-50 pb-20">
       {/* Top Header Banner */}
@@ -87,8 +91,14 @@ export default async function TourDetailsPage({
         <div className="absolute bottom-0 inset-x-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10 text-white">
           <div className="flex flex-wrap items-center gap-3 mb-3">
             <span className="bg-amber-500 text-slate-950 text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-full">
-              {tour.category.replace("-", " ")}
+              {categoryBadge}
             </span>
+            {tour.ship_class && (
+              <span className="bg-slate-800/90 text-amber-300 border border-amber-400/30 text-xs font-bold px-3 py-1 rounded-full">
+                {tour.ship_class}
+                {tour.ship_name ? ` • ${tour.ship_name}` : ""}
+              </span>
+            )}
             <span className="flex items-center gap-1 text-sm text-amber-400 font-semibold">
               <Star className="w-4 h-4 fill-amber-400" />
               {tour.rating} ({tour.reviews_count} reviews)
@@ -102,7 +112,12 @@ export default async function TourDetailsPage({
           <div className="flex flex-wrap items-center gap-6 text-sm text-slate-200">
             <span className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-amber-400" />
-              {t("city")}: <strong>{tour.city}</strong>
+              {tour.category === "nile-cruise"
+                ? "Sailing Route"
+                : tour.category === "package"
+                  ? "Destinations"
+                  : t("city")}
+              : <strong>{locationDisplay}</strong>
             </span>
             <span className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-400" />
@@ -135,13 +150,27 @@ export default async function TourDetailsPage({
               </div>
 
               <div className="flex items-start gap-3">
-                <UserCheck className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                {tour.category === "nile-cruise" ? (
+                  <Ship className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                ) : tour.category === "desert-safari" ? (
+                  <Compass className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                ) : (
+                  <UserCheck className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                )}
                 <div>
                   <span className="text-[11px] uppercase font-bold text-slate-400 block">
-                    Tour Type
+                    {tour.category === "nile-cruise"
+                      ? "Ship Category"
+                      : tour.category === "desert-safari"
+                        ? "Safari Type"
+                        : "Tour Type"}
                   </span>
                   <span className="text-sm font-bold text-slate-900">
-                    {tour.tour_type || "Private Tour"}
+                    {tour.category === "nile-cruise"
+                      ? tour.ship_class || "5-Star Deluxe"
+                      : tour.category === "desert-safari"
+                        ? tour.activity_type || tour.tour_type
+                        : tour.tour_type || "Private Tour"}
                   </span>
                 </div>
               </div>
@@ -153,7 +182,7 @@ export default async function TourDetailsPage({
                     Pick up & Drop off
                   </span>
                   <span className="text-sm font-bold text-slate-900">
-                    {tour.pickup_dropoff || tour.city}
+                    {tour.pickup_dropoff || locationDisplay}
                   </span>
                 </div>
               </div>
@@ -175,7 +204,7 @@ export default async function TourDetailsPage({
             <div className="bg-white rounded-2xl p-6 md:p-8 border border-slate-200/80 shadow-sm space-y-6">
               <div>
                 <h2 className="text-xl font-extrabold text-slate-900 mb-3">
-                  Tour Overview
+                  Overview
                 </h2>
                 <p className="text-slate-700 text-sm md:text-base leading-relaxed">
                   {summary}
